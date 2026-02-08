@@ -1,38 +1,32 @@
-<?php
-include('../includes/config.php');
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
 <style>
-    nav,
-    .navbar {
+    nav, .navbar {
         display: none !important;
+    }
+    .img-julius {
+        margin-top: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 </style>
 
-<head>
-    <meta charset="utf-8">
-    <title>EcoTrak — Cálculo de Água</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/aguaEco.css">
 
-    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/aguaEco.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-</head>
-
-<body class="p-4">
+<div class="container p-4">
 
     <a href="index.php" class="btn btn-secondary mb-3"> Voltar ao Menu</a>
 
-
-    <form action="cal_agua.php" method="GET">
+    <form action="index.php" method="GET">
+        <input type="hidden" name="page" value="cal-agua">
+        
         <h1>Quanto Você Gasta de Água</h1><br>
 
         <label for="quantidade">Quantidade de Itens de Uso:</label><br>
         <select name="quantidade" id="quantidade" class="form-select" style="width: 100px;">
             <?php
             for ($i = 1; $i <= 15; $i++) {
-                print "<option value='$i'>$i</option>";
+                $sel = (isset($_GET['quantidade']) && $_GET['quantidade'] == $i) ? 'selected' : '';
+                print "<option value='$i' $sel>$i</option>";
             }
             ?>
         </select><br><br>
@@ -41,38 +35,35 @@ include('../includes/config.php');
         <select name="pessoas" id="pessoas" class="form-select" style="width: 100px;">
             <?php
             for ($i = 1; $i <= 15; $i++) {
-                print "<option value='$i'>$i</option>";
+                $sel = (isset($_GET['pessoas']) && $_GET['pessoas'] == $i) ? 'selected' : '';
+                print "<option value='$i' $sel>$i</option>";
             }
             ?>
         </select><br><br>
 
         <label for="salario">Informe seu salário (R$):</label><br>
-        <input type="number" step="0.01" name="salario" id="salario" required><br><br>
+        <input type="number" step="0.01" name="salario" id="salario" class="form-control" style="width: 200px;" value="<?php echo $_GET['salario'] ?? ''; ?>" required><br><br>
 
-        <button type="submit" name="gerar">Gerar Campos</button>
+        <button type="submit" class="btn btn-primary" name="gerar">Gerar Campos</button>
     </form>
 
     <?php
-    print "<br>";
-    print "<br>";
-    print "<br>";
-    print "<br>";
-    print "<br>";
-    $quantidade = @$_GET['quantidade'];
+    $quantidade = $_GET['quantidade'] ?? null;
     $salario = $_GET['salario'] ?? 0;
-    $pessoas = @$_GET['pessoas'];
+    $pessoas = $_GET['pessoas'] ?? 1;
 
     if ($quantidade != "" && $quantidade != null) {
-        print "<hr><form action='cal_agua.php' method='GET'>";
+        print "<hr><form action='index.php' method='GET'>";
+        print "<input type='hidden' name='page' value='cal-agua'>"; // Garante permanência na página
         print "<input type='hidden' name='quantidade' value='$quantidade'>";
         print "<input type='hidden' name='salario' value='$salario'>";
         print "<input type='hidden' name='pessoas' value='$pessoas'>";
         print "<h2>Selecione os itens e o tempo de uso diário:</h2>";
 
         for ($i = 1; $i <= $quantidade; $i++) {
-            print "<div style='margin-bottom: 10px;'>";
+            print "<div style='margin-bottom: 10px;' class='border p-2'>";
             print "<label>Item $i:</label><br>";
-            print "<select name='agua[]'>
+            print "<select name='agua[]' class='form-select d-inline-block' style='width:auto;'>
                 <option value='1'>Chuveiro</option>
                 <option value='2'>Descarga</option>
                 <option value='3'>Torneira</option>
@@ -91,18 +82,18 @@ include('../includes/config.php');
               </select>";
 
             print " <label>Horas:</label> 
-               <input type='number' name='horas[]' min='0' max='24' value='0' style='width:60px;'>";
+                <input type='number' name='horas[]' min='0' max='24' value='0' class='form-control d-inline-block' style='width:70px;'>";
 
             print " <label>Minutos:</label> 
-               <input type='number' name='tempo[]' min='0' max='300' value='0' style='width:70px;'>";
+                <input type='number' name='tempo[]' min='0' max='300' value='0' class='form-control d-inline-block' style='width:80px;'>";
             print "</div>";
         }
-        print "<button type='submit'>Calcular</button>";
+        print "<button type='submit' name='calcular' class='btn btn-success'>Calcular Agora</button>";
         print "</form>";
     }
 
-    //*CÁLCULOS
-    if (isset($_GET['agua']) && isset($_GET['tempo']) && isset($_GET['horas'])) {
+    //* CÁLCULOS (Aparece após o Calcular)
+    if (isset($_GET['calcular']) && isset($_GET['agua'])) {
 
         $itens  = $_GET['agua'];
         $tempos = $_GET['tempo'];
@@ -112,170 +103,79 @@ include('../includes/config.php');
         $total_minutos  = 0;
 
         for ($i = 0; $i < count($itens); $i++) {
-
             $item    = $itens[$i];
             $minutos = ($tempos[$i]) + ($horas[$i] * 60);
             $total_minutos += $minutos;
 
             switch ($item) {
-
-                //*Chuveiro 15L
-                case 1:
-                    $litros_por_minuto = 15;
-                    break;
-
-                //*Descarga 12L
-                case 2:
-                    $litros_por_minuto = 12;
-                    break;
-
-                //*Torneira cozinha 10L
-                case 3:
-                    $litros_por_minuto = 10;
-                    break;
-
-                //*Brincadeiras com água 12L
-                case 4:
-                    $litros_por_minuto = 12;
-                    break;
-
-                //*Máquina roupa 2.5L
-                case 5:
-                    $litros_por_minuto = 2.5;
-                    break;
-
-                //*Máquina louça  
-                case 6:
-                    $litros_por_minuto = 0.6;
-                    break;
-
-                //*Mangueira 18L
-                case 7:
-                    $litros_por_minuto = 18;
-                    break;
-
-                //*Escovar dentes 10L
-                case 8:
-                    $litros_por_minuto = 10;
-                    break;
-
-                //*Caixa d’água vazando 16L
-                case 9:
-                    $litros_por_minuto = 16;
-                    break;
-
-                //*Banho demorado 18L
-                case 10:
-                    $litros_por_minuto = 18;
-                    break;
-
-                //*Limpeza 20L
-                case 11:
-                    $litros_por_minuto = 20;
-                    break;
-
-                //*Cozinhar 8L
-                case 12:
-                    $litros_por_minuto = 8;
-                    break;
-
-                //*Lavagem de carro 16L
-                case 13:
-                    $litros_por_minuto = 16;
-                    break;
-
-                //*Tanque (manual) 12L
-                case 14:
-                    $litros_por_minuto = 12;
-                    break;
-
-                //*Regar plantas 12L
-                case 15:
-                    $litros_por_minuto = 12;
-                    break;
-
-                default:
-                    $litros_por_minuto = 0;
+                case 1: $litros_por_minuto = 15; break;
+                case 2: $litros_por_minuto = 12; break;
+                case 3: $litros_por_minuto = 10; break;
+                case 4: $litros_por_minuto = 12; break;
+                case 5: $litros_por_minuto = 2.5; break;
+                case 6: $litros_por_minuto = 0.6; break;
+                case 7: $litros_por_minuto = 18; break;
+                case 8: $litros_por_minuto = 10; break;
+                case 9: $litros_por_minuto = 16; break;
+                case 10: $litros_por_minuto = 18; break;
+                case 11: $litros_por_minuto = 20; break;
+                case 12: $litros_por_minuto = 8; break;
+                case 13: $litros_por_minuto = 16; break;
+                case 14: $litros_por_minuto = 12; break;
+                case 15: $litros_por_minuto = 12; break;
+                default: $litros_por_minuto = 0;
             }
 
             $litros_dia = $litros_por_minuto * $minutos;
-
-            $m3_dia = $litros_dia / 1000;
-            $total_m3_dia += $m3_dia;
+            $total_m3_dia += ($litros_dia / 1000);
         }
 
-        //*Consumo diário e mensal 
         $consumo_dia = $total_m3_dia;
         $consumo_mes = $consumo_dia * 30;
 
-        //*Tarifas CAESB (Brasília)
+        //* Tarifas CAESB Simplificadas
         $valor_total = 0;
-        $restante = $consumo_mes;
-
-        if ($restante > 10) {
-            $valor_total += 10 * 4.13;
-            $restante = 10;
-
-            if ($restante > 5) {
-                $valor_total += 5 * 4.96;
-                $restante -= 5;
-                $valor_total += $restante * 11.18;
-            } else {
-                $valor_total += $restante * 4.96;
-            }
+        if ($consumo_mes <= 10) {
+            $valor_total = $consumo_mes * 4.13;
         } else {
-            $valor_total = $restante * 4.13;
+            $valor_total = (10 * 4.13) + (($consumo_mes - 10) * 4.96);
         }
 
-        //*Converter tempo total para horas:minutos
-        $horas_convertidas   = floor($total_minutos / 60);
-        $minutos_restantes   = $total_minutos % 60;
-
-        //*Taxa esgoto
         $valor_agua = $valor_total;
-        $valor_esgoto = $valor_agua;
-        $valor_total += $valor_esgoto;
-
-        //*Percentual do salário
-        $percentual    = ($salario > 0) ? ($valor_total / $salario) * 100 : 0;
+        $valor_total = $valor_agua * 2;
+        $horas_convertidas = floor($total_minutos / 60);
+        $minutos_restantes = $total_minutos % 60;
+        $percentual = ($salario > 0) ? ($valor_total / $salario) * 100 : 0;
         $resto_salario = $salario - $valor_total;
 
-        //*Classificação do consumo
         if ($percentual > 15) {
-            $nivel  = "Alta — Consome mais de 15% do salário!";
-            $cor    = "red";
-            $imagem = "JuliusBravo.jpeg";
+            $nivel = "Alta — Consome mais de 15% do salário!";
+            $cor = "red";
+            $imagem = "imgs/JuliusBravo.jpeg"; 
         } elseif ($percentual > 10) {
-            $nivel  = "Média — Fique atento, consome cerca de 10% do seu salário.";
-            $cor    = "orange";
-            $imagem = "JiuliusNeutro.jpg";
+            $nivel = "Média — Fique atento!";
+            $cor = "orange";
+            $imagem = "imgs/JiuliusNeutro.jpg";
         } else {
-            $nivel  = "Boa — Seu consumo está controlado! Consome menos de 10% do seu salário.";
-            $cor    = "green";
-            $imagem = "JuliusFeliz.jpeg";
+            $nivel = "Boa — Consumo controlado!";
+            $cor = "green";
+            $imagem = "imgs/JuliusFeliz.jpeg";
         }
 
-        print "<hr>";
-        print "<h3>Numero de pessoas: $pessoas </h3>";
-        print "<h3> Seu salário informado foi de <b>R$" . number_format($salario, 2, ',', '.') . "</b></h3>";
-        print "<h3>Percentual do Salário na conta de Água: <b>" . number_format($percentual, 2, ',', '.') . "%</b></h3>";
-        print "<h3> Tempo total de uso diário: <b>{$horas_convertidas}h {$minutos_restantes}min</b></h3>";
-        print "<h3> Consumo diário: <b>" . number_format($consumo_dia, 2, ',', '.') . " m³</b></h3>";
+        print "<div class='alert alert-info mt-4'>";
+        print "<h3>Número de pessoas: $pessoas </h3>";
+        print "<h3> Salário: <b>R$" . number_format($salario, 2, ',', '.') . "</b></h3>";
+        print "<h3> Percentual na conta: <b>" . number_format($percentual, 2, ',', '.') . "%</b></h3>";
         print "<h3> Consumo mensal: <b>" . number_format($consumo_mes, 2, ',', '.') . " m³</b></h3>";
-        print "<h3>Valor total da conta de Água (com esgoto): <b>R$ " . number_format($valor_total, 2, ',', '.') . "</b></h3>";
-        print "<h3>Salario restante após o gasto: <b>R$ " . number_format($resto_salario, 2, ',', '.') . "</b></h3>";
+        print "<h3> Valor Total (Água + Esgoto): <b>R$ " . number_format($valor_total, 2, ',', '.') . "</b></h3>";
         print "<h3 style='color:$cor;'>$nivel</h3>";
+        print "</div>";
 
-        //*imagem
-        print "<img src='$imagem' width='230' height='200' alt='Julius'>";
-
-        //* Site vai reiniciar
-        print "<br><form action='cal_agua.php' method='GET'>";
-        print "<button type='submit'>Calcular Novamente</button>";
-        print "</form>";
+        print "<img src='$imagem' width='230' class='img-julius' alt='Julius'>";
+        
+        print "<br><br><a href='?page=cal-agua' class='btn btn-warning'>Calcular Novamente</a>";
     }
     ?>
-    <script src="js/bootstrap.bundle.js"></script>
-</body>
+</div>
 
-</html
+<script src="js/bootstrap.bundle.js"></script>

@@ -1,345 +1,178 @@
-<?php
-include('../includes/config.php')
-?>
-<!DOCTYPE html>
-<html lang="pt-br">
-<html lang="pt-br">
 <style>
-    nav,
-    .navbar {
-        display: none !important;
-    }
+    nav, .navbar { display: none !important; }
+    .item-box { background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 5px solid #007bff; }
+    .resultado-card { border: 2px solid #ddd; border-radius: 15px; background: #fff; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 </style>
 
-<head>
-    <meta charset="utf-8">
-    <title>Quanto Você Gasta de Água + Luz</title>
-    <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/aguaLuzEco.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-</head>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/aguaLuzEco.css">
 
-<body class="p-4">
-
+<div class="container p-4">
     <a href="index.php" class="btn btn-secondary mb-3">Voltar ao Menu</a>
 
+    <form action="index.php" method="GET">
+        <input type="hidden" name="page" value="cal-total">
+        <h1 class="text-primary">EcoTrak — Consumo Global</h1>
 
-    <form action="cal_total.php" method="GET">
-        <h1>EcoTrak — Consumo de Água + Luz</h1><br>
-
-        <div class="mb-3">
-            <label for="item" class="form-label">Quantidade de Aparelhos (Água e Luz):</label>
-            <select name="item" id="item" class="form-select" style="width: 100px;">
-                <?php
-                for ($i = 1; $i <= 15; $i++) {
-                    print "<option value='$i'>$i</option>";
-                }
-                ?>
-            </select>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <label class="form-label"><b>Itens por categoria:</b></label>
+                <select name="item" class="form-select">
+                    <?php 
+                    for ($i = 1; $i <= 15; $i++) {
+                        $sel = (isset($_GET['item']) && $_GET['item'] == $i) ? 'selected' : '';
+                        echo "<option value='$i' $sel>$i</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label"><b>Pessoas na casa:</b></label>
+                <select name="pessoas" class="form-select">
+                    <?php 
+                    for ($i = 1; $i <= 15; $i++) {
+                        $sel = (isset($_GET['pessoas']) && $_GET['pessoas'] == $i) ? 'selected' : '';
+                        echo "<option value='$i' $sel>$i</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label"><b>Seu Salário (R$):</b></label>
+                <input type="number" step="0.01" name="salario" class="form-control" value="<?php echo $_GET['salario'] ?? ''; ?>" required>
+            </div>
         </div>
-
-        <label for="pessoas">Quantas pessoas moram na residência:</label><br>
-        <select name="pessoas" id="pessoas" class="form-select" style="width: 100px;">
-            <?php
-            for ($i = 1; $i <= 15; $i++)
-                print "<option value='$i'>$i</option>"; ?>
-        </select><br><br>
-
-        <label for="salario">Informe seu salário (R$):</label><br>
-        <input type="number" step="0.01" name="salario" id="salario" required><br><br>
-
-        <button type="submit" name="gerar">Gerar Campos</button>
+        <button type="submit" name="gerar" class="btn btn-primary w-100 mt-3">Gerar Campos de Preenchimento</button>
     </form>
 
     <?php
-    print "<br>";
-    print "<br>";
-    print "<br>";
-    print "<br>";
-    $pessoas = @$_GET['pessoas'];
-    $salario = $_GET['salario'] ?? null;
-    $item    = @$_GET['item'];
-    if ($pessoas && $salario) {
-        print "<hr><h2>Selecione os Itens de Água</h2>";
-        print "<form action='cal_total.php' method='GET'>";
-        print "<input type='hidden' name='pessoas' value='$pessoas'>";
-        print "<input type='hidden' name='salario' value='$salario'>";
-
-        //*Itens de Água
-        for ($i = 1; $i <= $item; $i++) {
-            print "<label>Item $i:</label> 
-               <select name='agua[]'>
-                    <option value='1'>Chuveiro</option>
-                    <option value='2'>Descarga</option>
-                    <option value='3'>Torneira</option>
-                    <option value='4'>Brincadeiras com água</option>
-                    <option value='5'>Máquina de Lavar Roupa</option>
-                    <option value='6'>Máquina de Lavar Louça</option>
-                    <option value='7'>Mangueira</option>
-                    <option value='8'>Torneira aberta</option>
-                    <option value='9'>Caixa d'água vazando</option>
-                    <option value='10'>Banho demorado</option>
-                    <option value='11'>Limpeza de casa</option>
-                    <option value='12'>Cozinhar alimentos</option>
-                    <option value='13'>Lavagem de carro</option>
-                    <option value='14'>Tanque (manual)</option>
-                    <option value='15'>Regar plantas</option>
-               </select>
-               <label>Horas:</label>
-               <input type='number' name='horas_agua[]' step='0.01' min='0' max='24' value='0' style='width:60px;'>
-               <label>Minutos:</label>
-               <input type='number' name='minutos_agua[]' min='0' max='59' value='0' style='width:70px;'><br><br>";
-        }
-
-        //*Itens de Luz
-        print "<hr><h2>Selecione os Aparelhos de Luz</h2>";
-        for ($i = 1; $i <= $item; $i++) {
-            print "<label>Aparelho $i:</label> 
-               <select name='luz[]'>
-                    <option value='1'>Ventilador</option>
-                    <option value='2'>Geladeira</option>
-                    <option value='3'>Chuveiro elétrico</option>
-                    <option value='4'>TV</option>
-                    <option value='5'>Freezer</option>
-                    <option value='6'>Computador/Notebook</option>
-                    <option value='7'>Micro-ondas</option>
-                    <option value='8'>Ferro de passar</option>
-                    <option value='9'>Máquina de lavar</option>
-                    <option value='10'>Lâmpada LED</option>
-                    <option value='11'>Ar-condicionado</option>
-                    <option value='12'>Carregador celular</option>
-                    <option value='13'>Roteador Wi-Fi</option>
-                    <option value='14'>Videogame / console</option>
-                    <option value='15'>Forno elétrico</option>
-               </select>
-               <label>Horas:</label>
-               <input type='number' name='horas_luz[]' min='0' max='24' value='0' style='width:60px;'>
-               <label>Minutos:</label>
-               <input type='number' name='minutos_luz[]' min='0' max='59' value='0' style='width:70px;'><br><br>";
-        }
-
-        print "<button type='submit'>Calcular Total</button>";
-        print "</form>";
-    }
-
-    //*CÁLCULO FINAL 
-    if (
-        isset($_GET['agua']) && isset($_GET['luz']) &&
-        isset($_GET['horas_agua']) && isset($_GET['minutos_agua']) &&
-        isset($_GET['horas_luz']) && isset($_GET['minutos_luz'])
-    ) {
+    // SÓ MOSTRA OS CAMPOS SE O USUÁRIO CLICAR EM "GERAR" OU JÁ TIVER CLICADO
+    if (isset($_GET['gerar']) || isset($_GET['calcular_total'])) {
+        $item = $_GET['item'] ?? 1;
         $pessoas = $_GET['pessoas'] ?? 1;
         $salario = $_GET['salario'] ?? 0;
 
-        $itensAgua = $_GET['agua'] ?? [];
-        $horasAgua = $_GET['horas_agua'] ?? [];
-        $minutosAgua = $_GET['minutos_agua'] ?? [];
+        print "<hr><form action='index.php' method='GET'>";
+        print "<input type='hidden' name='page' value='cal-total'>";
+        print "<input type='hidden' name='pessoas' value='$pessoas'>";
+        print "<input type='hidden' name='salario' value='$salario'>";
+        print "<input type='hidden' name='item' value='$item'>";
 
-        $itensLuz = $_GET['luz'] ?? [];
-        $horasLuz = $_GET['horas_luz'] ?? [];
-        $minutosLuz = $_GET['minutos_luz'] ?? [];
-
-        //*CÁLCULO ÁGUA
-        $totalLitrosDia = 0;
-        foreach ($itensAgua as $i => $item_agua) {
-            $horas = isset($horasAgua[$i]) ? (float)$horasAgua[$i] : 0;
-            $minutos = isset($minutosAgua[$i]) ? (float)$minutosAgua[$i] : 0;
-
-            switch ($item_agua) {
-                //*Chuveiro 15L
-                case 1:
-                    $litros_por_minuto = 15;
-                    break;
-                //*Descarga 12L
-                case 2:
-                    $litros_por_minuto = 12;
-                    break;
-                //*Torneira cozinha 10L
-                case 3:
-                    $litros_por_minuto = 10;
-                    break;
-                //*Brincadeiras com água 12L
-                case 4:
-                    $litros_por_minuto = 12;
-                    break;
-                //*Máquina roupa 2.5L
-                case 5:
-                    $litros_por_minuto = 2.5;
-                    break;
-                //*Máquina louça  
-                case 6:
-                    $litros_por_minuto = 0.6;
-                    break;
-                //*Mangueira 18L
-                case 7:
-                    $litros_por_minuto = 18;
-                    break;
-                //*Escovar dentes 10L
-                case 8:
-                    $litros_por_minuto = 10;
-                    break;
-                //*Caixa d’água vazando 16L
-                case 9:
-                    $litros_por_minuto = 16;
-                    break;
-                //*Banho demorado 18L
-                case 10:
-                    $litros_por_minuto = 18;
-                    break;
-                //*Limpeza 20L
-                case 11:
-                    $litros_por_minuto = 20;
-                    break;
-                //*Cozinhar 8L
-                case 12:
-                    $litros_por_minuto = 8;
-                    break;
-                //*Lavagem de carro 16L
-                case 13:
-                    $litros_por_minuto = 16;
-                    break;
-                //*Tanque (manual) 12L
-                case 14:
-                    $litros_por_minuto = 12;
-                    break;
-                //*Regar plantas 12L
-                case 15:
-                    $litros_por_minuto = 12;
-                    break;
-                default:
-                    $litros_por_minuto = 0;
-            }
-
-            $minutosTotais = ($horas * 60) + $minutos;
-            $totalLitrosDia += $litros_por_minuto * $minutosTotais;
+        echo "<div class='row'>";
+        
+        // COLUNA ÁGUA (15 ITENS)
+        echo "<div class='col-md-6'><h3 class='text-info'>Itens de Água</h3>";
+        for ($i = 0; $i < $item; $i++) {
+            echo "<div class='item-box'>
+                <label>Item ".($i+1).":</label>
+                <select name='agua[]' class='form-select mb-2'>
+                    <option value='1'>Chuveiro</option><option value='2'>Descarga</option>
+                    <option value='3'>Torneira Cozinha</option><option value='4'>Brincadeiras</option>
+                    <option value='5'>Máquina Roupa</option><option value='6'>Máquina Louça</option>
+                    <option value='7'>Mangueira</option><option value='8'>Escovar dentes</option>
+                    <option value='9'>Vazamento</option><option value='10'>Banho demorado</option>
+                    <option value='11'>Limpeza</option><option value='12'>Cozinhar</option>
+                    <option value='13'>Lavar Carro</option><option value='14'>Tanque</option>
+                    <option value='15'>Plantas</option>
+                </select>
+                <div class='row g-2'>
+                    <div class='col'><input type='number' name='h_agua[]' placeholder='H' class='form-control' value='0' min='0'></div>
+                    <div class='col'><input type='number' name='m_agua[]' placeholder='Min' class='form-control' value='0' min='0'></div>
+                </div>
+            </div>";
         }
+        echo "</div>";
 
-        $m3Dia = $totalLitrosDia / 1000;
-        $m3Mes = $m3Dia * 30;
-
-        $valorAgua = $m3Mes * 4.13;
-        $valorEsgoto = $valorAgua;
-        $totalAgua = $valorAgua + $valorEsgoto;
-
-        //*CÁLCULO LUZ
-        $valor_kwh = 0.90;
-        $totalLuz = 0;
-
-        foreach ($itensLuz as $i => $item_luz) {
-            $horas = isset($horasLuz[$i]) ? (float)$horasLuz[$i] : 0;
-            $minutos = isset($minutosLuz[$i]) ? (float)$minutosLuz[$i] : 0;
-
-            switch ($item_luz) {
-                case 1:
-                    //*  Ventilador 120 W 
-                case 1:
-                    $potencia = 120;
-                    break;
-                //* Geladeira 350 W 
-                case 2:
-                    $potencia = 350;
-                    $horas_de_consumo = $horas_de_consumo / 2;
-                    break;
-                //*Chuveiro elétrico 4500 W
-                case 3:
-                    $potencia = 4500;
-                    break;
-                //*TV LED 110 W
-                case 4:
-                    $potencia = 110;
-                    break;
-                //*Freezer 200 W
-                case 5:
-                    $potencia = 350;
-                    $horas_de_consumo = $horas_de_consumo * 0.25;
-                    break;
-                //*Computador/Notebook 150 W
-                case 6:
-                    $potencia = 150;
-                    break;
-                //*Micro-ondas 1200 W 
-                case 7:
-                    $potencia = 1200;
-                    break;
-                //*Ferro de passar 1000 W
-                case 8:
-                    $potencia = 1000;
-                    break;
-                //*Máquina de lavar 500 W
-                case 9:
-                    $potencia = 500;
-                    break;
-                //*Lâmpada LED 15 W
-                case 10:
-                    $potencia = 15;
-                    break;
-                //*Ar-condicionado 1500 W
-                case 11:
-                    $potencia = 2000;
-                    break;
-                //*Carregador celular 10 W
-                case 12:
-                    $potencia = 10;
-                    break;
-                //*Roteador Wi-Fi 10W
-                case 13:
-                    $potencia = 10;
-                    break;
-                //*Videogame / console 200 W
-                case 14:
-                    $potencia = 200;
-                    break;
-                //*Forno elétrico 1800 W 
-                case 15:
-                    $potencia = 1800;
-                    break;
-                default:
-                    $potencia = 0;
-            }
-
-            $horasTotais = $horas + ($minutos / 60);
-            $gasto = ($potencia * $horasTotais / 1000) * $valor_kwh;
-            $totalLuz += $gasto * 30;
+        // COLUNA LUZ (15 ITENS)
+        echo "<div class='col-md-6'><h3 class='text-warning'>Itens de Luz</h3>";
+        for ($i = 0; $i < $item; $i++) {
+            echo "<div class='item-box' style='border-left-color: #ffc107;'>
+                <label>Aparelho ".($i+1).":</label>
+                <select name='luz[]' class='form-select mb-2'>
+                    <option value='1'>Ventilador</option><option value='2'>Geladeira</option>
+                    <option value='3'>Chuveiro Elétrico</option><option value='4'>TV</option>
+                    <option value='5'>Freezer</option><option value='6'>Computador</option>
+                    <option value='7'>Micro-ondas</option><option value='8'>Ferro</option>
+                    <option value='9'>Máquina Lavar</option><option value='10'>Lâmpada LED</option>
+                    <option value='11'>Ar-condicionado</option><option value='12'>Carregador</option>
+                    <option value='13'>Wi-Fi</option><option value='14'>Videogame</option>
+                    <option value='15'>Forno Elétrico</option>
+                </select>
+                <div class='row g-2'>
+                    <div class='col'><input type='number' name='h_luz[]' placeholder='H' class='form-control' value='0' min='0'></div>
+                    <div class='col'><input type='number' name='m_luz[]' placeholder='Min' class='form-control' value='0' min='0'></div>
+                </div>
+            </div>";
         }
+        echo "</div></div>";
 
-        //*RESULTADO FINAL
-        $totalGeral = $totalAgua + $totalLuz;
-        $percentual = ($salario > 0) ? ($totalGeral / $salario) * 100 : 0;
-        $resto = $salario - $totalGeral;
+        print "<button type='submit' name='calcular_total' class='btn btn-success btn-lg w-100 mt-4 shadow-sm'>CALCULAR IMPACTO NO SALÁRIO</button>";
+        print "</form>";
+    }
 
-        if ($percentual > 15) {
-            $nivel = "Alta — Consome mais de 15% do salário!";
-            $cor = "red";
-            $imagem = "JuliusBravo.jpeg";
-        } elseif ($percentual > 10) {
-            $nivel = "Média — Consome cerca de 10% do salário.";
-            $cor = "orange";
-            $imagem = "JiuliusNeutro.jpg";
+    if (isset($_GET['calcular_total']) && isset($_GET['agua']) && isset($_GET['luz'])) {
+        $salario = (float)$_GET['salario'];
+        $pessoas = (int)$_GET['pessoas'];
+        
+        //* Cálculos Água
+        $total_litros_dia = 0;
+        $taxas_agua = [1=>15, 2=>12, 3=>10, 4=>12, 5=>2.5, 6=>0.6, 7=>18, 8=>10, 9=>16, 10=>18, 11=>20, 12=>8, 13=>16, 14=>12, 15=>12];
+        
+        foreach($_GET['agua'] as $index => $tipo) {
+            $h = (int)($_GET['h_agua'][$index] ?? 0);
+            $m = (int)($_GET['m_agua'][$index] ?? 0);
+            $total_litros_dia += ($taxas_agua[$tipo] ?? 0) * (($h * 60) + $m);
+        }
+        $custo_agua_mes = (($total_litros_dia / 1000) * 30 * 4.13) * 2; // Dobro por conta do esgoto
+
+        //* Cálculos Luz
+        $total_luz_mes = 0;
+        $potencias = [1=>120, 2=>350, 3=>4500, 4=>110, 5=>350, 6=>150, 7=>1200, 8=>1000, 9=>500, 10=>15, 11=>2000, 12=>10, 13=>10, 14=>200, 15=>1800];
+        
+        foreach($_GET['luz'] as $index => $tipo) {
+            $h = (int)($_GET['h_luz'][$index] ?? 0);
+            $m = (int)($_GET['m_luz'][$index] ?? 0);
+            $horas_decimais = $h + ($m / 60);
+            
+            $p = $potencias[$tipo] ?? 0;
+            if($tipo == 2 || $tipo == 5) $horas_decimais /= 2; // Ciclo de refrigeração
+            
+            $total_luz_mes += ($p * $horas_decimais / 1000) * 0.90 * 30;
+        }
+        $custo_luz_mes_total = $total_luz_mes * $pessoas;
+
+        $total_geral = $custo_agua_mes + $custo_luz_mes_total;
+        $percentual = ($salario > 0) ? ($total_geral / $salario) * 100 : 0;
+
+        //* Definindo Julius
+        if($percentual > 15) {
+            $cor = "red"; $nivel = "ALTA — Você está gastando demais!"; $img = "imgs/JuliusBravo.jpeg";
+        } elseif($percentual > 10) {
+            $cor = "orange"; $nivel = "MÉDIA — Cuidado com o desperdício."; $img = "imgs/JiuliusNeutro.jpg";
         } else {
-            $nivel = "Boa — Consome menos de 10% do salário.";
-            $cor = "green";
-            $imagem = "JuliusFeliz.jpeg";
+            $cor = "green"; $nivel = "BOA — Economia aprovada pelo Julius!"; $img = "imgs/JuliusFeliz.jpeg";
         }
 
-        print "<hr>";
-        print "<h2>Resultado Final</h2>";
-        print "<h3>Água: R$ " . number_format($totalAgua, 2, ',', '.') . "</h3>";
-        print "<h3>Luz: R$ " . number_format($totalLuz, 2, ',', '.') . "</h3>";
-        print "<h3><b>Total: R$ " . number_format($totalGeral, 2, ',', '.') . "</b></h3>";
-        print "<h3>Percentual do Salário: <b>" . number_format($percentual, 2, ',', '.') . "%</b></h3>";
-        print "<h3>Salário restante: <b>R$ " . number_format($resto, 2, ',', '.') . "</b></h3>";
-        print "<h3 style='color:$cor;'>$nivel</h3>";
-
-        //*imagem
-        if (isset($imagem)) {
-            print "<img src='$imagem' width='230' height='200'>";
-        }
-
-        print "<br><form action='cal_total.php' method='GET'>
-           <button type='submit'>Novo Cálculo</button></form>";
+        echo "<div class='resultado-card mt-5 text-center'>
+                <h2 class='mb-4'>Resultado do EcoTrak</h2>
+                <div class='row'>
+                    <div class='col-md-6 border-end'>
+                        <h5>Custo Mensal Água/Esgoto</h5>
+                        <h4 class='text-info'>R$ ".number_format($custo_agua_mes, 2, ',', '.')."</h4>
+                    </div>
+                    <div class='col-md-6'>
+                        <h5>Custo Mensal Energia</h5>
+                        <h4 class='text-warning'>R$ ".number_format($custo_luz_mes_total, 2, ',', '.')."</h4>
+                    </div>
+                </div>
+                <hr>
+                <h1 style='color:$cor'>TOTAL: R$ ".number_format($total_geral, 2, ',', '.')."</h1>
+                <p class='lead'>Isso representa <b>".number_format($percentual, 2, ',', '.')."%</b> do seu salário.</p>
+                <h3 style='color:$cor' class='mt-3'>$nivel</h3>
+                <img src='$img' width='230' height='200' class='mt-3 rounded shadow'>
+                <br><br>
+                <a href='index.php?page=cal-total' class='btn btn-outline-secondary'>Novo Cálculo</a>
+              </div>";
     }
     ?>
-    <script src="js/bootstrap.bundle.js"></script>
-</body>
-
-</html>
+</div>
