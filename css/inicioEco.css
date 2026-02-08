@@ -1,0 +1,171 @@
+/* GERAL */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #0d0d0d;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+nav.navbar {
+  background-color: rgba(0,0,0,0.9);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+}
+
+nav .navbar-brand {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00c896 !important;
+}
+
+nav .nav-link {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #fff !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  transition: 0.2s;
+}
+
+nav .nav-link:hover {
+  color: #00c896 !important;
+  transform: scale(1.05);
+}
+
+/* PRIMEIRA SESSÃO */
+.home-container {
+  text-align: center;
+  padding: 160px 20px;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
+              url('../imgs/Eco_trak.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+.home-container h1 {
+  font-size: 3rem;
+}
+
+.home-container h1 span {
+  color: #00c896;
+}
+
+.botao {
+  margin-top: 35px;
+  background-color: #00c896;
+  color: #fff;
+  padding: 14px 40px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: .3s;
+}
+
+.botao:hover {
+  background-color: #00a179;
+  transform: translateY(-3px);
+}
+
+/* SEGUNDA SESSÃO */
+.segunda-imagem {
+  background: url('../imgs/Luz.jpg') no-repeat center center;
+  background-size: cover;
+  padding: 160px 20px;
+
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.conteudo-segunda {
+  background: rgba(0,0,0,0.6);
+  padding: 40px 30px;
+  border-radius: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+/* Passos */
+.passos p {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+/* TERCEIRA SESSÃO */
+.terceira-imagem {
+  background: url('../imgs/d.jpg') no-repeat center center;
+  background-size: cover;
+  padding: 160px 20px;
+
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.conteudo-segunda {
+  background: rgba(0,0,0,0.6);
+  padding: 40px 30px;
+  border-radius: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+/* Passos */
+.passos p {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+/* QUARTA SESSÃO */
+.quarta-imagem {
+  background: url('../imgs/c.jpg') no-repeat center center;
+  background-size: cover;
+  padding: 160px 20px;
+
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.conteudo-segunda {
+  background: rgba(0,0,0,0.6);
+  padding: 40px 30px;
+  border-radius: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+/* Passos */
+.passos p {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+
+/* RODAPÉ */
+.rodape {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  background: #000000;
+  color: #ffffff;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 28px;
+  border-top: 1px solid #0ccfcf;
+}
+

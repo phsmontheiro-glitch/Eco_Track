@@ -1,0 +1,12 @@
+body {
+    background-image: url('../imgs/c.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    /* sombra escura */
+    background-color: rgba(49, 48, 48, 0.6);
+    background-blend-mode: darken;
+    color: white;
+    
+}
